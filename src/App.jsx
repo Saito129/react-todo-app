@@ -8,6 +8,7 @@ import TodoFooter from './components/TodoFooter';
 
 const STORAGE_KEY = 'taskflow_todos_v1';
 const THEME_KEY = 'taskflow_theme';
+const PALETTE_KEY = 'taskflow_palette';
 
 const INITIAL_TODOS = [
   {
@@ -49,11 +50,16 @@ const INITIAL_TODOS = [
 ];
 
 export function App() {
-  // Theme state
+  // Theme mode (Dark / Light)
   const [darkMode, setDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem(THEME_KEY);
     if (savedTheme) return savedTheme === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  // Color Palette Theme (Emerald, Ocean, Sunset, Violet, Midnight)
+  const [currentPalette, setCurrentPalette] = useState(() => {
+    return localStorage.getItem(PALETTE_KEY) || 'emerald';
   });
 
   // Apply dark mode class to root document element
@@ -66,6 +72,12 @@ export function App() {
       localStorage.setItem(THEME_KEY, 'light');
     }
   }, [darkMode]);
+
+  // Apply palette theme attribute to root document element
+  useEffect(() => {
+    document.documentElement.setAttribute('data-palette', currentPalette);
+    localStorage.setItem(PALETTE_KEY, currentPalette);
+  }, [currentPalette]);
 
   const toggleDarkMode = () => setDarkMode(prev => !prev);
 
@@ -202,11 +214,13 @@ export function App() {
   return (
     <div className="app-layout">
       <main className="todo-container">
-        {/* Header Component */}
+        {/* Header Component with Theme & Palette Controls */}
         <TodoHeader
           todos={todos}
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
+          currentPalette={currentPalette}
+          onChangePalette={setCurrentPalette}
         />
 
         {/* Input Form Component */}
